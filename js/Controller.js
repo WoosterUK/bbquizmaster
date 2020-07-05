@@ -1,3 +1,3 @@
-var App = {
+var QuizmasterApp = {
   name: 'Quizmaster'
 }
