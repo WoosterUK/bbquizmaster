@@ -1,11 +1,18 @@
 var question_types = {};
 
 class QuestionType {
-  constructor({name, abbreviation, answer_format, answer_translator = undefined}) {
+  constructor({
+    name,
+    abbreviation,
+    answer_format,
+    answer_translator = undefined,
+    multiple_answers = true
+  }) {
     this.name = name;
     this.abbrev = abbreviation;
     this.answer_format = answer_format;
     this.answer_translator = answer_translator;
+    this.multiple_answers = multiple_answers;
   }
   
   getName() { return this.name; }
