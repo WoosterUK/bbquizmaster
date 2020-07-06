@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<script src="js/Controller.js"></script>
+<script src="js/DataModel.js"></script>
+<script>
+var question_types = [];
+question_types.push(
+  new QuestionType(
+    {
+      name: 'Multiple Choice',
+      abbreviation: 'MC',
+      answer_format: [new StringAnswer(), new CorrectAnswer()]
+    }
+  )
+);
+console.log(question_types[0].name);
+</script>
+</head>
+
+<body>
+
+</body>
+
+</html>
