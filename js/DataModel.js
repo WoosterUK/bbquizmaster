@@ -9,6 +9,7 @@ class QuestionType {
     this.abbrev = abbreviation;
     this.answer_format = answer_format;
     this.multiple_answers = multiple_answers;
+    console.log(`Added QuestionType ${name}.`);
   }
   
   getName() { return this.name; }
@@ -26,6 +27,7 @@ class Answer {
     this.desc = description;
     this.TypeClass = variable_type;
     this.translator = translator;
+    console.log(`Created Answer of type ${name}.`);
   }
 }
 
