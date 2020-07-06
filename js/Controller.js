@@ -1,7 +1,11 @@
-var jQueryScript = document.createElement('script');  
+var jQueryScript = document.createElement('script');
 jQueryScript.setAttribute('src','https://unpkg.com/mathjs@7.0.2/dist/math.min.js');
 document.head.appendChild(jQueryScript);
 
 var QuizmasterApp = {
   name: 'Quizmaster'
+}
+
+for (let i of question_data) {
+	console.log(i.name);
 }

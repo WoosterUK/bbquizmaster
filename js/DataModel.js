@@ -1,20 +1,4 @@
-class QuestionType {
-  constructor({
-    name,
-    abbreviation,
-    answer_format,
-    multiple_answers = true
-  }) {
-    this.name = name;
-    this.abbrev = abbreviation;
-    this.answer_format = answer_format;
-    this.multiple_answers = multiple_answers;
-    console.log(`Added QuestionType ${name}.`);
-  }
-  
-  getName() { return this.name; }
-  getAbbrev() { return this.abbrev; }
-}
+// Answer is the superclass for different kinds of answers
 
 class Answer {
   constructor({
@@ -60,4 +44,41 @@ class CorrectAnswer extends Answer {
       translator: function (x) { if (x) { return 'correct'; } else { return 'incorrect'; } }
     });
   }
+}
+
+class NumberAnswer extends Answer {
+  constructor() {
+    super({
+      name: "Numeric value",
+      description: "Type the formula for the numeric value. See [blah] for reference.",
+      variable_type: Number
+    });
+  }
+}
+
+// question_types is a register of QuestionType sub-classes
+
+var question_types = [];
+
+// QuestionType is the superclass for the different question construction objects
+
+class QuestionType {
+  constructor({
+    name,
+    abbreviation,
+    answer_format,
+    multiple_answers = true,
+    question_text = undefined
+  }) {
+    this.name = name;
+    this.abbrev = abbreviation;
+    this.answer_format = answer_format;
+    this.multiple_answers = multiple_answers;
+    this.question_text = question_text;
+    question_types.push(this);
+    console.log(`Added QuestionType ${name}.`);
+  }
+  
+  getName() { return this.name; }
+  getAbbrev() { return this.abbrev; }
 }
