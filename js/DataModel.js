@@ -1,5 +1,3 @@
-var question_types = {};
-
 class QuestionType {
   constructor({
     name,
