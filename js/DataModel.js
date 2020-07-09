@@ -11,7 +11,7 @@ class Answer {
     this.desc = description;
     this.TypeClass = variable_type;
     this.translator = translator;
-    console.log(`Created Answer of type ${name}.`);
+    console.log(`Created Answer of type ${typeof(variable_type())}.`);
   }
 }
 
@@ -73,7 +73,7 @@ class QuestionType {
     this.name = name;
     this.abbrev = abbreviation;
     this.answer_format = answer_format;
-    this.multiple_answers = multiple_answers;
+    this.max_answers = max_answers;
     this.question_text = question_text;
     this.answers = [];
     question_types.push(this);
@@ -83,12 +83,15 @@ class QuestionType {
   getName() { return this.name; }
   getAbbrev() { return this.abbrev; }
 
-  addAnswerBlock() { for (let i of this.answer_format) {
-    // the answer_format is a list of Answer subclasses
-    // this code spins up new instances within that list, and adds the new, blank instances to the list of answers
+  addAnswerBlock() { 
     var answer_block = [];
-    answer_block.push(new i());
+    for (let i of this.answer_format) {
+      // the answer_format is a list of Answer subclasses
+      // this code spins up new instances within that list, and adds the new, blank instances to the list of answers
+      answer_block.push(new i());
+    }
     this.answers.push(answer_block);
+    console.log(`Added answer block in ${this.name}`);
     return true;
   }
 }
