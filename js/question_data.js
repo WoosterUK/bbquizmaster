@@ -13,7 +13,7 @@ var question_data = [
 		name: 'True / False',
 		abbreviation: 'TF',
 		answer_format: [new StringAnswer(), new BooleanAnswer()],
-		multiple_answers: false
+		max_answers: 1
 	},
 	{
 		name: 'Ordering',
@@ -33,6 +33,7 @@ var question_data = [
 	{
 		name: 'Numeric Response',
 		abbreviation: 'NUM',
-		answer_format: [new NumberAnswer(), new NumberAnswer()]
+		answer_format: [new NumberAnswer(), new NumberAnswer()],
+		max_answers: 1
 	}
 ];

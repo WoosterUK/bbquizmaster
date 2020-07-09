@@ -67,7 +67,7 @@ class QuestionType {
     name,
     abbreviation,
     answer_format,
-    multiple_answers = true,
+    max_answers = 100,
     question_text = undefined
   }) {
     this.name = name;
