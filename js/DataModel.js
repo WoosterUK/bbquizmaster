@@ -75,10 +75,20 @@ class QuestionType {
     this.answer_format = answer_format;
     this.multiple_answers = multiple_answers;
     this.question_text = question_text;
+    this.answers = [];
     question_types.push(this);
     console.log(`Added QuestionType ${name}.`);
   }
   
   getName() { return this.name; }
   getAbbrev() { return this.abbrev; }
+
+  addAnswerBlock() { for (let i of this.answer_format) {
+    // the answer_format is a list of Answer subclasses
+    // this code spins up new instances within that list, and adds the new, blank instances to the list of answers
+    var answer_block = [];
+    answer_block.push(new i());
+    this.answers.push(answer_block);
+    return true;
+  }
 }
