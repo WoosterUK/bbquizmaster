@@ -1,6 +1,6 @@
 // Answer is the superclass for different kinds of answers
 
-class Answer {
+Answer = class {
   constructor({
     name,
     description,
@@ -56,19 +56,16 @@ class NumberAnswer extends Answer {
   }
 }
 
-// question_types is a register of QuestionType sub-classes
-
-var question_types = [];
-
 // QuestionType is the superclass for the different question construction objects
 
-class QuestionType {
+QuizmasterApp.QuestionType =class {
   constructor({
-    name,
-    abbreviation,
+    name = "",
+    abbreviation = "",
     answer_format,
     max_answers = 100,
-    question_text = undefined
+    question_text = undefined,
+    questions_types = []
   }) {
     this.name = name;
     this.abbrev = abbreviation;
@@ -76,7 +73,7 @@ class QuestionType {
     this.max_answers = max_answers;
     this.question_text = question_text;
     this.answers = [];
-    question_types.push(this);
+    this.addAnswerBlock();
     console.log(`Added QuestionType ${name}.`);
   }
   
