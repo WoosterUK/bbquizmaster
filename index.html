@@ -1,22 +1,11 @@
 <!DOCTYPE html>
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-<meta content="utf-8" http-equiv="encoding">
 
 <html>
 
 <head>
-<script src="https://unpkg.com/mathjs@7.1.0/dist/math.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/immutable@4.0.0-rc.12/dist/immutable.min.js"></script>
-
-<!--script src="js/Controller.js"></script-->
-<!--script src="js/DataModel.js"></script-->
-<script src="js/Variable.js"></script>
-<script src="js/VariableList.js"></script>
-<script src="js/MathsTemplate.js"></script>
-<script src="js/Answer.js"></script>
-<!--script src="js/AnswerList.js"></script-->
-<!--script>
+<script src="js/Controller.js"></script>
+<script src="js/DataModel.js"></script>
+<script>
 var question_types = [];
 question_types.push(
   new QuestionType(
@@ -28,149 +17,9 @@ question_types.push(
   )
 );
 console.log(question_types[0].name);
-</script-->
-<h1>In devlopment...</h1>
-<h2>Variables</h2>
-<h3>Question random variables</h3>
-<div id="div_qrv"></div>
-<button type="button" id="button_add_qrv">Add</button>
-<h3>Question derived variables</h3>
-<div id="div_qdv"></div>
-<button type="button" id="button_add_qdv">Add</button>
-<h3>Answer random variables</h3>
-<div id="div_arv"></div>
-<button type="button" id="button_add_arv">Add</button>
-<h3>Answer derived variables</h3>
-<div id="div_adv"></div>
-<button type="button" id="button_add_adv">Add</button>
-<h2>Question</h2>
-Question: <textarea id="text_question" name="Text1" cols="100" rows="6"></textarea>
-</head>
-<h2>Answers</h2>
-<input id="input_answer_total" type="number" min="1">Total number of answers</input>
-<h3>Correct answers</h3>
-<div id="div_ca"></div>
-<button type="button" id="button_add_ca">Add</button>
-<h3>Incorrect answers</h3>
-<div id="div_ia"></div>
-<button type="button" id="button_add_ia">Add</button>
-
-<h2>Preview</h2>
-<button type="button" id="button_preview">Generate preview</button>
-<div id="div_preview_question">$$$$</div>
-
-
-<script>
-
-const appendHtml = (outerId, newId, html) => {
-  console.log('appending');
-  const newElement = document.createElement('div')
-  newElement.innerHTML = html
-  newElement.id = newId
-  document.getElementById(outerId).appendChild(newElement)
-  return newElement
-}
-
-const varCounts = {qrv: 0, qdv: 0, arv: 0, adv: 0}
-const insertVarHtml = (type) => {
-
-  const index = varCounts[type]++
-  const id = type + index
-
-  let html
-  if (type[1] == "r") {
-    const name = `Name: <input id="name_${id}"/>`
-    const dropDown = `Type: <select id="rv_${id}"><option>Integer</option>`
-        + `<option>Float</option></select>`
-    const minimum = `Minimum: <input id="min_${id}"/>`
-    const maximum = `Maximum: <input id="max_${id}"/>`
-    html = name + dropDown + minimum + maximum
-  } else {
-    //const up = 'onchange="update(this)"'
-    const name = `Name: <input id="name_${id}"/>`
-    const expression = `Expression: <input id="raw_${id}"/>`
-    const simple = `Simplify: <input id="simple_${id}" type="checkbox"/>`
-    html = name + expression + simple
-  }
-  const kids = appendHtml(`div_${type}`, `div_${id}`, html + "<br/>").children
-  for (let i =0; i < kids.length; i++) {
-    kids[i].addEventListener('change', (ev) => updateVar(ev, type, index))
-  }
-}
-
-const addQrvRow = () => { insertVarHtml("qrv") }
-const addQdvRow = () => { insertVarHtml("qdv") }
-const addArvRow = () => { insertVarHtml("arv") }
-const addAdvRow = () => { insertVarHtml("adv") }
-
-
-document.getElementById("button_add_qrv").addEventListener("click", addQrvRow)
-document.getElementById("button_add_qdv").addEventListener("click", addQdvRow)
-document.getElementById("button_add_arv").addEventListener("click", addArvRow)
-document.getElementById("button_add_adv").addEventListener("click", addAdvRow)
-
-var varList = emptyLists
-
-const updateVar = (ev, type, index) => {
-  console.log(`updateVar(${ev}, ${type}, ${index})`)
-  if (type[1] == 'd') {
-    const args = {
-      name: document.getElementById(`name_${type}${index}`).value,
-      raw: document.getElementById(`raw_${type}${index}`).value,
-      simple: document.getElementById(`simple_${type}${index}`).checked
-    }
-    varList = varList.set(type, index, expressionVariable(args))
-  } else {
-    const args = {
-      name: document.getElementById(`name_${type}${index}`).value,
-      float: document.getElementById(`rv_${type}${index}`).value == 'Float',
-      min: document.getElementById(`min_${type}${index}`).value,
-      max: document.getElementById(`max_${type}${index}`).value
-    }
-    varList = varList.set(type, index, randomVariable(args))
-  }
-  //const labels = type[1] == 'd' ? ['name', 'raw', 'simple'] : ['name', 'float', 'min', 'max']
-  //const args = labels.map(x => document.getElementById(`${x}_${type}${index}`)[x == 'simple' ? 'checked' : 'value'])
-  //const f = (type[1] == 'd') ? expressionVariable : randomVariable
-  //arList = varList.set(type, index, f(...args))
-
-  //varList.set(type, index, )
-}
-
-const answerCounts = {ca: 0, ia: 0}
-const insertAnswerHtml = (type) => {
-
-  const id = type + answerCounts[type]++
-  const expression =  `Expression: <input id="raw_${id}"/>`
-  const min = `Minimum: <input type="number" id="min_${id}" min="0" value="0"/>`
-  const max = `Maximum: <input type="number" id="max_${id}" min="0" value="1"/>`
-  const html = expression + min + max + '<br/>'
-  document.getElementById(`div_${type}`).innerHTML += html
-}
-
-const addCaRow = () => { insertAnswerHtml("ca") }
-const addIaRow = () => { insertAnswerHtml("ia") }
-
-
-
-document.getElementById("button_add_ca").addEventListener("click", addCaRow)
-document.getElementById("button_add_ia").addEventListener("click", addIaRow)
-
-
-const generatePreview = () => {
-  console.log('value: ' + document.getElementById('text_question').value)
-  const newList = varList.newRandoms(true)
-  const tex = mathsTemplate(document.getElementById('text_question').value.split('\\').join('\\\\')).substitute(newList.context())
-  document.getElementById('div_preview_question').innerHTML = tex
-  //const elem = MathJax.Hub.getAllJax('div_preview_question')[0]
-  console.log(`tex: ${tex}`)
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'div_preview_question'])
-}
-document.getElementById('button_preview').addEventListener('click', generatePreview)
-
-
-
 </script>
+</head>
+
 <body>
 
 </body>
