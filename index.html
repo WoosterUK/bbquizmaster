@@ -160,8 +160,12 @@ const generatePreview = () => {
   const total = parseInt(document.getElementById("input_answer_total").value)
   const answers = addAnswers(addAnswers(noAnswers(total), true), false)
   const instToHtml = (x) => `<input type="checkbox" onclick="return false" ${x.correct ? 'checked' : ''}>${x.latex}</input>`
-  const ansHtml = answers.instances(newList).map((x) => instToHtml(x)).join('<br/>')
-  document.getElementById('div_preview_answers').innerHTML = ansHtml
+  try {
+    const ansHtml = answers.instances(newList).map((x) => instToHtml(x)).join('<br/>')
+    document.getElementById('div_preview_answers').innerHTML = ansHtml
+  } catch (e) {
+    document.getElementById('div_preview_answers').innerHTML = e
+  }
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'div_preview_question'])
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'div_preview_answers'])
 }
