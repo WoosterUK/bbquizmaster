@@ -1,24 +1,56 @@
 const answer = (raw, correct, min, max) => {
+  console.log(`answer(${raw}, ${correct}, ${min}, ${max})`)
   return answerFromTemplate(mathsTemplate(raw), correct, min, max)
 }
 
 const answerFromTemplate = (template, correct, min, max) => Object.freeze({
   template: template,
   correct: correct,
-  min: min,
+  min: min > 0 ? min : 0,
   max: max,
 
-  latex(must, context) {
-    if (must ? min : max > 0) {
-      return Immutable.List([template.substitute(context)])
+  instance(must, variableList) {
+    if (must ? (min > 0) : (max - min) > 0) {
+      const newVarList = variableList.newRandoms(false)
+      const newInst = Object.freeze({
+        variableList: newVarList,
+        latex: template.substitute(newVarList.context()),
+        hash: stringHash(this.latex),
+        correct: correct,
+
+        equals(other) {
+          return other.latex === this.latex
+        },
+
+        hashCode() {
+          return this.hash
+        },
+
+        toString() {
+          return this.latex
+        }
+      })
+      return Immutable.List([newInst])
+    } else {
+      return Immutable.List()
     }
-    return Immutable.List()
   },
-  
+
   next(must) {
-    if (must ? min : max > 0) {
-      return answerFromTemplate(template, correct, --min, --max)
+    if (must ? (min > 0) : (max - min) > 0) {
+      const newMin = min > 0 ? min - 1 : 0
+      return answerFromTemplate(template, correct, newMin, max - 1)
+    } else {
+      return this
     }
-    return this
   }
 })
+
+const stringHash = (string, soFar=53) => {
+  if (string) {
+    const newSoFar = (37*soFar + string.charCodeAt(0)) | 0
+    return stringHash(string.slice(1), newSoFar)
+  } else {
+    return soFar
+  }
+}

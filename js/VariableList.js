@@ -65,6 +65,10 @@ const variableLists = ({ qrv=el, qdv=el, arv=el, adv=el }) => {
       newVals.arv = arv.map((x) => x.next())
       console.log('newVals: ' + objectString(newVals))
       return variableLists(Object.assign({}, this, newVals))
+    },
+
+    toString() {
+      return `variableLists({ qrv=${qrv}, qdv=${qdv}, arv=${arv}, adv=${adv} })`
     }
   })
 }

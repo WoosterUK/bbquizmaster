@@ -1,5 +1,5 @@
 const mathsTemplate = (raw) => {
-  const thisTemplate = raw.split('${').join('${this.')
+  const thisTemplate = raw.split('${').join('${this.').split('\\').join('\\\\')
   const fun = new Function(`return \`${thisTemplate}\``)
   return {
     raw: raw,
