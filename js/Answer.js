@@ -10,6 +10,7 @@ const answerFromTemplate = (template, correct, min, max) => Object.freeze({
   max: max,
 
   instance(must, variableList) {
+    console.log(`Answer.instance(${must}, ${variableList})`)
     if (must ? (min > 0) : (max - min) > 0) {
       const newVarList = variableList.newRandoms(false)
       const newInst = Object.freeze({
@@ -27,7 +28,7 @@ const answerFromTemplate = (template, correct, min, max) => Object.freeze({
         },
 
         toString() {
-          return this.latex
+          return `${this.latex} (${this.correct ? '' : 'in'}correct)`
         }
       })
       return Immutable.List([newInst])
@@ -43,6 +44,10 @@ const answerFromTemplate = (template, correct, min, max) => Object.freeze({
     } else {
       return this
     }
+  },
+
+  toString() {
+    return `AnswerSet(${template}, ${correct}, ${min}, ${max}`
   }
 })
 
