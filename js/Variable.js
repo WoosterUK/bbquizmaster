@@ -1,5 +1,5 @@
 const randomVariable = ({name, float, min, max}) => {
-  console.log(`randomVariable(${name}, ${float}, ${min}, ${max})`)
+  if (logging) { console.log(`randomVariable(${name}, ${float}, ${min}, ${max})`) }
   const parse = float ? parseFloat : parseInt
   const [a, b] = [min, max].map((x) => parse(x))
   return (b > a) ? checkedRandomVariable(name, float, a, b) : invalidVariable(name)
@@ -7,7 +7,7 @@ const randomVariable = ({name, float, min, max}) => {
 }
 
 const checkedRandomVariable = (name, float, a, b) => {
-  console.log(`checkedRandomVariable = (${name}, ${float}, ${a}, ${b})`)
+  if (logging) { console.log(`checkedRandomVariable = (${name}, ${float}, ${a}, ${b})`) }
   const generate = float ? () =>  math.random(a, b) : () => math.randomInt(a, b + 1)
   return ({
     name: name,
@@ -21,7 +21,7 @@ const checkedRandomVariable = (name, float, a, b) => {
 }
 
 const invalidVariable = (name) => {
-  console.log(`invalidVariable(${name})`)
+  if (logging) { console.log(`invalidVariable(${name})`) }
   return {
     name: name,
     valid: false,
@@ -31,7 +31,7 @@ const invalidVariable = (name) => {
 }
 
 const expressionVariable = ({name, raw, simple, namespace = Immutable.List()}) => {
-  console.log(`expressionVariable(${name}, ${raw}, ${simple}, ${namespace})`)
+  if (logging) { console.log(`expressionVariable(${name}, ${raw}, ${simple}, ${namespace})`) }
   let node
   try {
     node = math.parse(raw)
@@ -47,7 +47,7 @@ const expressionVariable = ({name, raw, simple, namespace = Immutable.List()}) =
 }
 
 const expressionVariableFromNode = ({name, raw, simple, node}) => {
-  console.log(`expressionVariableFromNode = (${name}, ${raw}, ${simple}, ${node})`)
+  if (logging) { console.log(`expressionVariableFromNode = (${name}, ${raw}, ${simple}, ${node})`) }
   return {
     name: name,
     raw: raw,
@@ -56,14 +56,13 @@ const expressionVariableFromNode = ({name, raw, simple, node}) => {
     valid: true,
 
     substitute(toSubst) {
-      console.log(`${this}.substitute(${toSubst})`)
+      if (logging) { console.log(`${this}.substitute(${toSubst})`) }
       if (toSubst.isEmpty()) {
         return this
       } else if (!toSubst.last().valid) {
         return this.substitute(toSubst.pop())
       } else {
         const { name: substName, node: substNode } = toSubst.last()
-        console.log(`substName: ${substName}, substNode: ${substNode}`)
         const newNode = this.node.transform((nd, path, parent) => {
           if (nd.isSymbolNode && nd.name === substName) {
             return substNode

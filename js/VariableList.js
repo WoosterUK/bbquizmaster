@@ -1,7 +1,7 @@
 const el = Immutable.List()
 
 const updateFrom = (oldList, index) => {
-  console.log(`updateFrom(${oldList}, ${index}`);
+  if (logging) { console.log(`updateFrom(${oldList}, ${index}`) }
   if (index >= oldList.size) {
     return oldList
   } else {
@@ -13,13 +13,13 @@ const updateFrom = (oldList, index) => {
 }
 
 const updateNext = (previousList, oldList, index) => {
-  console.log(`updateNext(${previousList}, ${oldList}, ${index})`)
+  if (logging) { console.log(`updateNext(${previousList}, ${oldList}, ${index})`) }
   const n = previousList.size
   return updateFrom(previousList.concat(oldList), index + n).slice(n)
 }
 
 const variableLists = ({ qrv=el, qdv=el, arv=el, adv=el }) => {
-  console.log(`variableLists({ qrv=${qrv}, qdv=${qdv}, arv=${arv}, adv=${adv} })`)
+  if (logging) { console.log(`variableLists({ qrv=${qrv}, qdv=${qdv}, arv=${arv}, adv=${adv} })`) }
   return Object.freeze({
     qrv: qrv,
     qdv: qdv,
@@ -28,11 +28,10 @@ const variableLists = ({ qrv=el, qdv=el, arv=el, adv=el }) => {
 
 
     set(type, index, variable) {
-      console.log(`set(${type}, ${index}, ${variable})`)
+      if (logging) { console.log(`set(${type}, ${index}, ${variable})`) }
       const added = this[type]
         .set(index, variable)
         .map((x) => typeof x == 'undefined' ? invalidVariable('') : x)
-      console.log('added: ' + added)
       const newVals = {}
       if (type == 'qdv') {
         newVals.qdv = updateFrom(added, index)
@@ -42,28 +41,24 @@ const variableLists = ({ qrv=el, qdv=el, arv=el, adv=el }) => {
       } else {
         newVals[type] = added
       }
-      console.log('newVals: ' + objectString(newVals))
       return variableLists(Object.assign({}, this, newVals))
     },
 
     context () {
       const firstThree = qrv.concat(updateNext(qrv, qdv, 0)).concat(arv)
       const allFour = firstThree.concat(updateNext(firstThree, adv, 0))
-      //console.log(`generating context: ${allFour}`)
       const cntxt = {}
       allFour.forEach((x, i) => { if (x.valid) cntxt[x.name] = x.node.toTex() })
-      console.log(`context: ${objectString(cntxt)}`);
       return Object.freeze(cntxt)
     },
 
     newRandoms(newQuestion) {
-      console.log(`newRandoms(${newQuestion})`)
+      if (logging) { console.log(`newRandoms(${newQuestion})`) }
       const newVals = {}
       if (newQuestion) {
         newVals.qrv = qrv.map((x) => x.next())
       }
       newVals.arv = arv.map((x) => x.next())
-      console.log('newVals: ' + objectString(newVals))
       return variableLists(Object.assign({}, this, newVals))
     },
 

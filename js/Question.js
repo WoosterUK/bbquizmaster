@@ -1,5 +1,5 @@
 const question = (raw) => {
-  console.log('question(${name})')
+  if (logging) { console.log('question(${name})') }
   const template = mathsTemplate(raw)
   return Object.freeze({
     template: template,

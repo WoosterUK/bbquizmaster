@@ -1,4 +1,5 @@
 const downloadTsv = (generator, filename = 'questionPool.tsv') => {
+  if (logging) { `downloadTsv(${generator}, ${filename})` }
   const uriComp = encodeURIComponent(generator.generateTsvString())
   const element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + uriComp);

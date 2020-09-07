@@ -1,7 +1,6 @@
 const multiAnswer = (variableList, question, answerSet) => {
-  console.log(`multiAnswer(${variableList}, ${question}, ${answerSet})`)
+  if (logging) { console.log(`multiAnswer(${variableList}, ${question}, ${answerSet})`) }
   return Object.freeze({
-
     generateTsvString(numQuestions = 500) {
       const generateTsvLines = (toDo = 500, soFar = el) => {
         if (toDo <= 0) {

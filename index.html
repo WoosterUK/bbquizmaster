@@ -11,6 +11,7 @@
 
 <!--script src="js/Controller.js"></script-->
 <!--script src="js/DataModel.js"></script-->
+<script>const logging = false</script>
 <script src="js/Variable.js"></script>
 <script src="js/VariableList.js"></script>
 <script src="js/MathsTemplate.js"></script>
@@ -68,8 +69,9 @@ Question: <textarea id="text_question" name="Text1" cols="100" rows="6"></textar
 
 <script>
 
+
+
 const appendHtml = (outerId, newId, html) => {
-  console.log('appending');
   const newElement = document.createElement('div')
   newElement.innerHTML = html
   newElement.id = newId
@@ -118,7 +120,7 @@ document.getElementById("button_add_adv").addEventListener("click", addAdvRow)
 var varList = emptyLists
 
 const updateVar = (ev, type, index) => {
-  console.log(`updateVar(${ev}, ${type}, ${index})`)
+  if (logging) { console.log(`updateVar(${ev}, ${type}, ${index})`) }
   if (type[1] == 'd') {
     const args = {
       name: document.getElementById(`name_${type}${index}`).value,
@@ -156,7 +158,6 @@ document.getElementById("button_add_ia").addEventListener("click", addIaRow)
 
 
 const generatePreview = () => {
-  console.log('value: ' + document.getElementById('text_question').value)
   const newList = varList.newRandoms(true)
   const tex = makeQuestion().instance(newList).latex
   document.getElementById('div_preview_question').innerHTML = tex
@@ -182,7 +183,7 @@ const makeAnswerSet = () => {
 }
 
 const addAnswers = (oldSet, correct) => {
-  console.log(`addAnswers(${oldSet}, ${correct})`)
+  if (logging) { console.log(`addAnswers(${oldSet}, ${correct})`) }
   const type = correct ? 'ca' : 'ia'
   let newSet = oldSet
   for (let i=0; true; i++) {
@@ -191,7 +192,6 @@ const addAnswers = (oldSet, correct) => {
       break
     }
     const raw = inputField.value
-    console.log("raw: " + raw)
     const min = parseInt(document.getElementById(`min_${type}${i}`).value)
     const max = parseInt(document.getElementById(`max_${type}${i}`).value)
     newSet = newSet.addAnswer(raw, correct, min, max)

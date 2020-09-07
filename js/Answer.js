@@ -1,5 +1,5 @@
 const answer = (raw, correct, min, max) => {
-  console.log(`answer(${raw}, ${correct}, ${min}, ${max})`)
+  if (logging) { console.log(`answer(${raw}, ${correct}, ${min}, ${max})`) }
   return answerFromTemplate(mathsTemplate(raw), correct, min, max)
 }
 
@@ -10,7 +10,7 @@ const answerFromTemplate = (template, correct, min, max) => Object.freeze({
   max: max,
 
   instance(must, variableList) {
-    console.log(`Answer.instance(${must}, ${variableList})`)
+    if (logging) { console.log(`Answer.instance(${must}, ${variableList})`) }
     if (must ? (min > 0) : (max - min) > 0) {
       const newVarList = variableList.newRandoms(false)
       const newInst = Object.freeze({
