@@ -158,13 +158,13 @@ document.getElementById("button_add_ia").addEventListener("click", addIaRow)
 
 
 const generatePreview = () => {
-  const newList = varList.newRandoms(true)
-  const tex = makeQuestion().instance(newList).latex
+  const qInst = makeQuestion().instance(varList)
+  const tex = qInst.latex
   document.getElementById('div_preview_question').innerHTML = tex
   const answers = makeAnswerSet()
   const instToHtml = (x) => `<input type="checkbox" onclick="return false" ${x.correct ? 'checked' : ''}>${x.latex}</input>`
   try {
-    const ansHtml = answers.instances(newList).map((x) => instToHtml(x)).join('<br/>')
+    const ansHtml = answers.instances(qInst.variableList).map((x) => instToHtml(x)).join('<br/>')
     document.getElementById('div_preview_answers').innerHTML = ansHtml
   } catch (e) {
     document.getElementById('div_preview_answers').innerHTML = e
