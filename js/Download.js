@@ -1,4 +1,4 @@
-const downloadTsv = (generator, filename = 'questionPool.tsv') => {
+const downloadTsv = (generator, filename) => {
   if (logging) { `downloadTsv(${generator}, ${filename})` }
   const uriComp = encodeURIComponent(generator.generateTsvString())
   const element = document.createElement('a');

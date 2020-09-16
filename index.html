@@ -11,7 +11,7 @@
 
 <!--script src="js/Controller.js"></script-->
 <!--script src="js/DataModel.js"></script-->
-<script>const logging = false</script>
+<script>const logging = true</script>
 <script src="js/Variable.js"></script>
 <script src="js/VariableList.js"></script>
 <script src="js/MathsTemplate.js"></script>
@@ -65,6 +65,8 @@ Question: <textarea id="text_question" name="Text1" cols="100" rows="6"></textar
 <div id="div_preview_answers">$$$$</div>
 
 <h2>Generate TSV file</h2>
+<input id="input_download" value="questionPool"/>.txt
+<br>
 <button type="button" id="button_download">Download</button>
 
 <script>
@@ -192,9 +194,11 @@ const addAnswers = (oldSet, correct) => {
       break
     }
     const raw = inputField.value
-    const min = parseInt(document.getElementById(`min_${type}${i}`).value)
-    const max = parseInt(document.getElementById(`max_${type}${i}`).value)
-    newSet = newSet.addAnswer(raw, correct, min, max)
+    if (raw) {
+      const min = parseInt(document.getElementById(`min_${type}${i}`).value)
+      const max = parseInt(document.getElementById(`max_${type}${i}`).value)
+      newSet = newSet.addAnswer(raw, correct, min, max)
+    }
   }
   return newSet
 }
@@ -203,7 +207,8 @@ document.getElementById('button_preview').addEventListener('click', generatePrev
 
 const download = () => {
   const ma = multiAnswer(varList, makeQuestion(), makeAnswerSet())
-  downloadTsv(ma)
+  const fn = document.getElementById('input_download').value
+  downloadTsv(ma, fn + '.txt')
 }
 
 document.getElementById('button_download').addEventListener('click', download)
