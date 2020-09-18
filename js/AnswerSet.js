@@ -32,7 +32,8 @@ const answerSet = (answers, total, soFar = es) => {
       const musts = mustsAnswerSet.soFar
       const extras = mustsAnswerSet.generateInstances(variableList, false).soFar
       const extrasNeeded = total - musts.size
-      return select(extrasNeeded, extras.subtract(musts)).union(musts)
+      const finalSet = select(extrasNeeded, extras.subtract(musts)).union(musts)
+      return select(finalSet.size, finalSet)
     },
 
     addAnswer(raw, correct, min, max) {
