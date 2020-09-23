@@ -1,27 +1,244 @@
 <!DOCTYPE html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
 
 <html>
 
 <head>
-<script src="js/Controller.js"></script>
-<script src="js/DataModel.js"></script>
-<script>
-var question_types = [];
-question_types.push(
-  new QuestionType(
-    {
-      name: 'Multiple Choice',
-      abbreviation: 'MC',
-      answer_format: [new StringAnswer(), new CorrectAnswer()]
-    }
-  )
-);
-console.log(question_types[0].name);
-</script>
+	<link rel="stylesheet" href="css/style.css">
+	<script src="https://unpkg.com/mathjs@7.1.0/dist/math.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/immutable@4.0.0-rc.12/dist/immutable.min.js"></script>
+	<link rel = "stylesheet" href="version.css">
+
+	<!--script src="js/Controller.js"></script-->
+	<!--script src="js/DataModel.js"></script-->
+	<script>const logging = true</script>
+	<script src="js/Variable.js"></script>
+	<script src="js/VariableList.js"></script>
+	<script src="js/MathsTemplate.js"></script>
+	<script src="js/Question.js"></script>
+	<script src="js/Answer.js"></script>
+	<script src="js/AnswerSet.js"></script>
+	<script src="js/MultiAnswer.js"></script>
+	<script src="js/Download.js"></script>
+	<!--script>
+	var question_types = [];
+	question_types.push(
+	  new QuestionType(
+	    {
+	      name: 'Multiple Choice',
+	      abbreviation: 'MC',
+	      answer_format: [new StringAnswer(), new CorrectAnswer()]
+	    }
+	  )
+	);
+	console.log(question_types[0].name);
+	</script-->
 </head>
 
-<body>
+<body style="height: 100%;">
+	<div class="fixed-header" id="mainHeader">
+		<div class="container">
+			<h1>Blackboard Quiz Generator </h1>
+			In development: v <span class="versionNumber"></span>
+		</div>
+	</div>
+	<div id="mainBody container">
+		<h2>Variables</h2>
+		<h3>Question random variables</h3>
+		<div id="div_qrv"></div>
+		<button type="button" id="button_add_qrv">Add</button>
+		<h3>Question derived variables</h3>
+		<div id="div_qdv"></div>
+		<button type="button" id="button_add_qdv">Add</button>
+		<h3>Answer random variables</h3>
+		<div id="div_arv"></div>
+		<button type="button" id="button_add_arv">Add</button>
+		<h3>Answer derived variables</h3>
+		<div id="div_adv"></div>
+		<button type="button" id="button_add_adv">Add</button>
+		<h2>Question</h2>
+		Question: <textarea id="text_question" name="Text1" cols="100" rows="6"></textarea>
+		<h2>Answers</h2>
+		<input id="input_answer_total" type="number" min="1">Total number of answers</input>
+		<h3>Correct answers</h3>
+		<div id="div_ca"></div>
+		<button type="button" id="button_add_ca">Add</button>
+		<h3>Incorrect answers</h3>
+		<div id="div_ia"></div>
+		<button type="button" id="button_add_ia">Add</button>
 
+		<h2>Preview</h2>
+		<button type="button" id="button_preview">Generate preview</button>
+		<div id="div_preview_question">$$$$</div>
+		<div id="div_preview_answers">$$$$</div>
+
+		<h2>Generate TSV file</h2>
+		<input id="input_download" value="questionPool"/>.txt
+		<br>
+		<button type="button" id="button_download">Download</button>
+
+		<script>
+
+
+
+		const appendHtml = (outerId, newId, html) => {
+		  const newElement = document.createElement('div')
+		  newElement.innerHTML = html
+		  newElement.id = newId
+		  document.getElementById(outerId).appendChild(newElement)
+		  return newElement
+		}
+
+		const varCounts = {qrv: 0, qdv: 0, arv: 0, adv: 0}
+		const insertVarHtml = (type) => {
+
+		  const index = varCounts[type]++
+		  const id = type + index
+
+		  let html
+		  if (type[1] == "r") {
+		    const name = `Name: <input id="name_${id}"/>`
+		    const dropDown = `Type: <select id="rv_${id}"><option>Integer</option>`
+		        + `<option>Float</option></select>`
+		    const minimum = `Minimum: <input id="min_${id}"/>`
+		    const maximum = `Maximum: <input id="max_${id}"/>`
+		    html = name + dropDown + minimum + maximum
+		  } else {
+		    //const up = 'onchange="update(this)"'
+		    const name = `Name: <input id="name_${id}"/>`
+		    const expression = `Expression: <input id="raw_${id}"/>`
+		    const simple = `Simplify: <input id="simple_${id}" type="checkbox"/>`
+		    html = name + expression + simple
+		  }
+		  const kids = appendHtml(`div_${type}`, `div_${id}`, html + "<br/>").children
+		  for (let i =0; i < kids.length; i++) {
+		    kids[i].addEventListener('change', (ev) => updateVar(ev, type, index))
+		  }
+		}
+
+		const addQrvRow = () => { insertVarHtml("qrv") }
+		const addQdvRow = () => { insertVarHtml("qdv") }
+		const addArvRow = () => { insertVarHtml("arv") }
+		const addAdvRow = () => { insertVarHtml("adv") }
+
+
+		document.getElementById("button_add_qrv").addEventListener("click", addQrvRow)
+		document.getElementById("button_add_qdv").addEventListener("click", addQdvRow)
+		document.getElementById("button_add_arv").addEventListener("click", addArvRow)
+		document.getElementById("button_add_adv").addEventListener("click", addAdvRow)
+
+		var varList = emptyLists
+
+		const updateVar = (ev, type, index) => {
+		  if (logging) { console.log(`updateVar(${ev}, ${type}, ${index})`) }
+		  if (type[1] == 'd') {
+		    const args = {
+		      name: document.getElementById(`name_${type}${index}`).value,
+		      raw: document.getElementById(`raw_${type}${index}`).value,
+		      simple: document.getElementById(`simple_${type}${index}`).checked
+		    }
+		    varList = varList.set(type, index, expressionVariable(args))
+		  } else {
+		    const args = {
+		      name: document.getElementById(`name_${type}${index}`).value,
+		      float: document.getElementById(`rv_${type}${index}`).value == 'Float',
+		      min: document.getElementById(`min_${type}${index}`).value,
+		      max: document.getElementById(`max_${type}${index}`).value
+		    }
+		    varList = varList.set(type, index, randomVariable(args))
+		  }
+		}
+
+		const answerCounts = {ca: 0, ia: 0}
+
+		const insertAnswerHtml = (type) => {
+		  const id = type + answerCounts[type]++
+		  const expression =  `Expression: <input id="raw_${id}"/>`
+		  const min = `Minimum: <input type="number" id="min_${id}" min="0" value="0"/>`
+		  const max = `Maximum: <input type="number" id="max_${id}" min="0" value="1"/>`
+		  const html = `${expression}${min}${max}<br/>`
+		  appendHtml(`div_${type}`, `div_${id}`, html)
+		}
+
+		const addCaRow = () => { insertAnswerHtml("ca") }
+		const addIaRow = () => { insertAnswerHtml("ia") }
+
+		document.getElementById("button_add_ca").addEventListener("click", addCaRow)
+		document.getElementById("button_add_ia").addEventListener("click", addIaRow)
+
+
+		const generatePreview = () => {
+		  const qInst = makeQuestion().instance(varList)
+		  const tex = qInst.latex
+		  document.getElementById('div_preview_question').innerHTML = tex
+		  const answers = makeAnswerSet()
+		  const instToHtml = (x) => `<input type="checkbox" onclick="return false" ${x.correct ? 'checked' : ''}>${x.latex}</input>`
+		  try {
+		    const ansHtml = answers.instances(qInst.variableList).map((x) => instToHtml(x)).join('<br/>')
+		    document.getElementById('div_preview_answers').innerHTML = ansHtml
+		  } catch (e) {
+		    document.getElementById('div_preview_answers').innerHTML = e
+		  }
+		  MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'div_preview_question'])
+		  MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'div_preview_answers'])
+		}
+
+		const makeQuestion = () => {
+		  return question(document.getElementById('text_question').value)
+		}
+
+		const makeAnswerSet = () => {
+		  const total = parseInt(document.getElementById("input_answer_total").value)
+		  return addAnswers(addAnswers(noAnswers(total), true), false)
+		}
+
+		const addAnswers = (oldSet, correct) => {
+		  if (logging) { console.log(`addAnswers(${oldSet}, ${correct})`) }
+		  const type = correct ? 'ca' : 'ia'
+		  let newSet = oldSet
+		  for (let i=0; true; i++) {
+		    const inputField = document.getElementById(`raw_${type}${i}`)
+		    if (inputField === null) {
+		      break
+		    }
+		    const raw = inputField.value
+		    if (raw) {
+		      const min = parseInt(document.getElementById(`min_${type}${i}`).value)
+		      const max = parseInt(document.getElementById(`max_${type}${i}`).value)
+		      newSet = newSet.addAnswer(raw, correct, min, max)
+		    }
+		  }
+		  return newSet
+		}
+
+		document.getElementById('button_preview').addEventListener('click', generatePreview)
+
+		const download = () => {
+		  const ma = multiAnswer(varList, makeQuestion(), makeAnswerSet())
+		  const fn = document.getElementById('input_download').value
+		  downloadTsv(ma, fn + '.txt')
+		}
+
+		document.getElementById('button_download').addEventListener('click', download)
+
+		</script>
+	</div>
+	<div class="fixed-footer" id="mainFooter">
+		<div class="container">
+			<div class="divTable">
+				<div class="divRow">
+					<div class="divCell" style="width: 50%;">
+						Developed by Adrian Martin and Philip Walker
+					</div>
+					<div class="divCell" style="text-align: right; width: 50%;">
+						A project of PRIME: Practice-Based Research and Innovation in Mathematics Education
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

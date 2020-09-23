@@ -1,0 +1,4 @@
+.versionNumber::before {
+	white-space: nowrap;
+	content: "0.1.0";
+}
