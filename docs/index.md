@@ -8,8 +8,8 @@ This tool is developed within the University of Leeds and is optimised for its i
 
 ## The structure of an assessment item
 An individual assessment item is composed of several elements, in two categories: one element, in a category of its own, is the question; the other elements, in the other category, are the answers.
-* The question may have some _random variables_ associated with it, as well as some _derived variables_ that are calculated from those _random variables_. Question derived variables are computed exactly once for the assessment item.
-* Each answer may have its own random variables, as well as derived variables that are calculated from those _random variables_. These _derived variables_ are re-computed for each answer to be displayed to the student.
+* The question may have some _random variables_ associated with it, as well as some _derived variables_ that are calculated from those random variables. Question derived variables are computed exactly once for the assessment item.
+* Each answer may have its own random variables, as well as derived variables that are calculated from those random variables. These derived variables are re-computed for each answer to be displayed to the student.
 
 ## Using variables
 **Making new variables.** The 'add' button allows you to create a new variable. Please note that there is not currently any functionality to remove variables once added.
